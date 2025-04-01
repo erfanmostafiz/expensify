@@ -4,13 +4,13 @@ import { colors } from "@/constants/theme";
 import { useRouter } from "expo-router";
 
 const index = () => {
-    const router = useRouter();
-    useEffect(() => {
-        // wait for 2 seconds, and then move to the welcome page
-        setTimeout(() => {
-            router.push("/(auth)/welcome");
-        }, 2000);
-    }, []);
+    // const router = useRouter();
+    // useEffect(() => {
+    //     // wait for 2 seconds, and then move to the welcome page
+    //     setTimeout(() => {
+    //         router.push("/(auth)/welcome");
+    //     }, 2000);
+    // }, []);
 
     return (
         <View style={styles.container}>
