@@ -54,3 +54,15 @@ export const createOrUpdateWallet = async (
         return { success: false, msg: error.message };
     }
 };
+
+// delete wallet service
+export const deleteWallet = async (walletId: string): Promise<ResponseType> => {
+    try {
+    } catch (error: any) {
+        console.log("error deleting the wallet: ", error);
+        return {
+            success: false,
+            msg: error.message,
+        };
+    }
+};

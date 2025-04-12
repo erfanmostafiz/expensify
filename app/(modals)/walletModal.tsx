@@ -15,14 +15,14 @@ import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
 import { Image } from "expo-image";
 import { getProfileImage } from "@/services/imageService";
-import * as Iccons from "phosphor-react-native";
+import * as Icons from "phosphor-react-native";
 import Typo from "@/components/Typo";
 import Input from "@/components/Input";
 import { WalletType } from "@/types";
 import Button from "@/components/Button";
 import { useAuth } from "@/contexts/authContext";
 import { updateUser } from "@/services/userService";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import ImageUpload from "@/components/imageUpload";
 import { createOrUpdateWallet } from "@/services/walletService";
@@ -42,6 +42,19 @@ const WalletModal = () => {
 
     const router = useRouter();
 
+    // data that we got from the parent component
+    const oldWallet: { name: string; image: string; id: string } =
+        useLocalSearchParams();
+
+    useEffect(() => {
+        if (oldWallet?.id) {
+            // means we're updating a wallet. Not  creating a new one
+            setWallet({
+                name: oldWallet?.name,
+                image: oldWallet?.image,
+            });
+        }
+    }, []);
     const onSubmit = async () => {
         let { name, image } = wallet;
         if (!name.trim() || !image) {
@@ -55,7 +68,8 @@ const WalletModal = () => {
             uid: user?.uid,
         };
 
-        // todo: include wallet id if updating
+        // include wallet id if updating
+        if (oldWallet?.id) data.id = oldWallet?.id;
 
         setLoading(true);
 
@@ -63,7 +77,7 @@ const WalletModal = () => {
         const res = await createOrUpdateWallet(data);
         setLoading(false);
 
-        console.log("results: ", res);
+        // console.log("results: ", res);
 
         // if firebase updated, update the current state next
         if (res.success) {
@@ -73,11 +87,36 @@ const WalletModal = () => {
         }
     };
 
+    // delete function
+    const onDelete = async () => {
+        console.log("Deleting the wallet: ", oldWallet?.id);
+    };
+
+    // delete button alert
+    const showDeleteAlert = () => {
+        Alert.alert(
+            "Confirm",
+            "Are you sure you want to do this? \n \nThis action will remove all the transactions related to this wallet",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel delete"),
+                    style: "cancel",
+                },
+                {
+                    text: "Delete",
+                    onPress: () => onDelete(),
+                    style: "destructive",
+                },
+            ]
+        );
+    };
+
     return (
         <ModalWrapper>
             <View style={styles.container}>
                 <Header
-                    title="New Wallet"
+                    title={oldWallet?.id ? "Update Wallet" : "New Wallet"}
                     leftIcon={<BackButton />}
                     style={{ marginBottom: spacingY._10 }}
                 />
@@ -112,13 +151,29 @@ const WalletModal = () => {
             </View>
 
             <View style={styles.footer}>
+                {/* delete */}
+                {oldWallet?.id && (
+                    <Button
+                        onPress={showDeleteAlert}
+                        style={{
+                            backgroundColor: colors.rose,
+                            paddingHorizontal: spacingX._15,
+                        }}
+                    >
+                        <Icons.Trash
+                            color={colors.white}
+                            size={verticalScale(24)}
+                            weight="bold"
+                        />
+                    </Button>
+                )}
                 <Button
                     onPress={onSubmit}
                     style={{ flex: 1 }}
                     loading={loading}
                 >
                     <Typo color={colors.black} fontWeight={700}>
-                        Add Wallet
+                        {oldWallet?.id ? "Update Wallet" : "Add Wallet"}
                     </Typo>
                 </Button>
             </View>
