@@ -35,6 +35,7 @@ import { orderBy, where } from "firebase/firestore";
 import DateTimePicker, {
     DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { createOrUpdateTransaction } from "@/services/transactionService";
 
 const TransactionModal = () => {
     // states for name & image
@@ -110,6 +111,18 @@ const TransactionModal = () => {
         };
 
         console.log("Transaction data: ", transactionData);
+
+        // todo: include transaction id for updating the transaction
+
+        setLoading(true);
+        const res = await createOrUpdateTransaction(transactionData);
+        setLoading(false);
+        if (res.success) {
+            // go back to the previous screen
+            router.back();
+        } else {
+            Alert.alert("Transaction", res.msg);
+        }
     };
 
     // delete function
