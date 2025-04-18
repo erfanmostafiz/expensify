@@ -165,9 +165,12 @@ const revertAndUpdateWallets = async (
             Number(originalWallet[revertType]) - Number(oldTransaction.amount);
 
         // ✅ Validation
-        if (newTransactionType === "expense") {
+        // Validation Checks
+        if (newTransactionType == "expense") {
+            // if user tries to convert an expense to income on the same wallet, but the wallet does not have enough balance
+            // if the user tries to increase the expense amount on the same wallet, but the wallet does not have enough balance
             if (
-                oldTransaction.walletId === newWalletId &&
+                oldTransaction.walletId == newWalletId &&
                 revertedWalletAmount < newTransactionAmount
             ) {
                 return {
@@ -175,12 +178,14 @@ const revertAndUpdateWallets = async (
                     msg: "Selected wallet does not have enough balance for this transaction",
                 };
             }
-        }
-        if (newWallet.amount! < newTransactionAmount) {
-            return {
-                success: false,
-                msg: "Selected wallet does not have enough balance for this transaction",
-            };
+
+            // ✅ FIX: Only run this check for expenses
+            if (newWallet.amount! < newTransactionAmount) {
+                return {
+                    success: false,
+                    msg: "Selected wallet does not have enough balance for this transaction",
+                };
+            }
         }
 
         await createOrUpdateWallet({

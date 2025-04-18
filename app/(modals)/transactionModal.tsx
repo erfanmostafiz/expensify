@@ -118,9 +118,13 @@ const TransactionModal = () => {
             category,
             date,
             walletId,
-            image,
+            image: image ? image : null,
             uid: user?.uid,
         };
+
+        // console.log("transaction data: ", transactionData);
+        // return;
+
         // for updating transacion
         if (oldTransaction?.id) {
             transactionData.id = oldTransaction?.id;
