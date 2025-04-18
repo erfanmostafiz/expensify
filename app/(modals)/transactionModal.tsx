@@ -71,33 +71,45 @@ const TransactionModal = () => {
         orderBy("created", "desc"),
     ]);
 
-    // data that we got from the parent component
-    const oldTransaction: { name: string; image: string; id: string } =
-        useLocalSearchParams();
+    type paramType = {
+        id: string;
+        type: string;
+        amount: string;
+        category?: string;
+        date: string;
+        description?: string;
+        image?: string;
+        uid?: string;
+        walletId: string;
+    };
 
-    // useEffect(() => {
-    //     if (oldTransaction?.id) {
-    //         // means we're updating a wallet. Not  creating a new one
-    //         setTransaction({
-    //             name: oldTransaction?.name,
-    //             image: oldTransaction?.image,
-    //         });
-    //     }
-    // }, []);
+    // data that we got from the parent component
+    const oldTransaction: paramType = useLocalSearchParams();
+
+    useEffect(() => {
+        if (oldTransaction?.id) {
+            // means we're updating the transaction. Not  creating a new one
+            setTransaction({
+                type: oldTransaction?.type,
+                amount: Number(oldTransaction?.amount),
+                description: oldTransaction.description || "",
+                category: oldTransaction.category || "",
+                date: new Date(oldTransaction.date),
+                walletId: oldTransaction.walletId,
+                image: oldTransaction?.image,
+            });
+        }
+    }, []);
 
     const onSubmit = async () => {
         // get these values from the state
         const { type, amount, description, category, date, walletId, image } =
             transaction;
-
         // check if all the values are filled
         if (!amount || !date || !walletId || (type == "expense" && !category)) {
             Alert.alert("Transaction", "Please fill all the fields");
             return;
         }
-
-        // console.log("good to go");
-
         // create a new transaction object. This will contain all the possible values that we gonna store while creating the transaction
         let transactionData: TransactionType = {
             type,
@@ -109,10 +121,10 @@ const TransactionModal = () => {
             image,
             uid: user?.uid,
         };
-
-        // console.log("Transaction data: ", transactionData);
-
-        // todo: include transaction id for updating the transaction
+        // for updating transacion
+        if (oldTransaction?.id) {
+            transactionData.id = oldTransaction?.id;
+        }
 
         setLoading(true);
         const res = await createOrUpdateTransaction(transactionData);
