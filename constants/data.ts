@@ -82,7 +82,7 @@ export const incomeCategory: CategoryType = {
     label: "Income",
     value: "income",
     icon: Icons.CurrencyDollarSimple,
-    bgColor: "#16a34a", // Dark
+    bgColor: "#009691", // Dark
 };
 
 export const transactionTypes = [

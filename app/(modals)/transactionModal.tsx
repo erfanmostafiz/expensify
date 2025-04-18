@@ -96,7 +96,7 @@ const TransactionModal = () => {
             return;
         }
 
-        console.log("good to go");
+        // console.log("good to go");
 
         // create a new transaction object. This will contain all the possible values that we gonna store while creating the transaction
         let transactionData: TransactionType = {
@@ -110,7 +110,7 @@ const TransactionModal = () => {
             uid: user?.uid,
         };
 
-        console.log("Transaction data: ", transactionData);
+        // console.log("Transaction data: ", transactionData);
 
         // todo: include transaction id for updating the transaction
 

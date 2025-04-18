@@ -6,8 +6,9 @@ import { verticalScale } from "@/utils/styling";
 import Typo from "./Typo";
 import { FlashList } from "@shopify/flash-list";
 import Loading from "./Loading";
-import { expenseCategories } from "@/constants/data";
+import { expenseCategories, incomeCategory } from "@/constants/data";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { Timestamp } from "firebase/firestore";
 
 const TransactionList = ({
     data,
@@ -68,9 +69,19 @@ const TransactionItem = ({
     index,
     handleClick,
 }: TransactionItemProps) => {
-    // get the category from the expenseCategories object
-    let category = expenseCategories["entertainment"];
+    // get the category from the item
+    let category =
+        item?.type == "income"
+            ? incomeCategory
+            : expenseCategories[item.category!];
     const IconComponent = category.icon;
+    // transaction date
+    const date = (item?.date as Timestamp)
+        ?.toDate()
+        ?.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+        });
 
     return (
         <Animated.View
@@ -103,17 +114,27 @@ const TransactionItem = ({
                         color={colors.neutral400}
                         textProps={{ numberOfLines: 1 }}
                     >
-                        went to the movies
+                        {item.description}
                     </Typo>
                 </View>
 
                 {/* amount and date */}
                 <View style={styles.amountDate}>
-                    <Typo fontWeight={500} color={colors.rose}>
-                        - $40
+                    <Typo
+                        fontWeight={500}
+                        color={
+                            item?.type == "income"
+                                ? colors.primary
+                                : colors.rose
+                        }
+                    >
+                        {/* append + if income, - if expense */}
+                        {`${item?.type == "income" ? "+ $" : "- $"}${
+                            item.amount
+                        }`}
                     </Typo>
                     <Typo size={13} color={colors.neutral400}>
-                        14 Apr
+                        {date}
                     </Typo>
                 </View>
             </TouchableOpacity>
